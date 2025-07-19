@@ -101,66 +101,38 @@ class RegistrasiController
     }
 
     public function update($id)
-    {
-        header('Content-Type: application/json');
-        try {
-            $data = $_POST;
-            $registrasi = RegistrasiModel::find($id);
-            if (!$registrasi) {
-                http_response_code(404);
-                echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
-                return;
-            }
+{
+    header('Content-Type: application/json');
+    try {
+        $data = $_POST;
+        $registrasi = RegistrasiModel::find($id);
 
-            $uploadDir = __DIR__ . '/../uploads/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-            $foto_ktp = $this->uploadFile('foto_ktp', $uploadDir) ?? $registrasi->foto_ktp;
-            $foto_rmh = $this->uploadFile('foto_rmh', $uploadDir) ?? $registrasi->foto_rmh;
-            $foto_kk  = $this->uploadFile('foto_kk', $uploadDir) ?? $registrasi->foto_kk;
-
-            $tanggal = isset($data['tanggal']) && trim($data['tanggal']) !== ''
-                ? $data['tanggal']
-                : $registrasi->tanggal;
-
-            $registrasi->update([
-                'mgm_id'               => $data['mgm_id'] ?? $registrasi->mgm_id,
-                'jenis_daf_id'         => $data['jenis_daf_id'] ?? $registrasi->jenis_daf_id,
-                'nama_lengkap'         => $data['nama_lengkap'] ?? $registrasi->nama_lengkap,
-                'whatsapp'             => $data['whatsapp'] ?? $registrasi->whatsapp,
-                'alamat'               => $data['alamat'] ?? $registrasi->alamat,
-                'rt'                   => $data['rt'] ?? $registrasi->rt,
-                'rw'                   => $data['rw'] ?? $registrasi->rw,
-                'provinsi_id'          => $data['provinsi_id'] ?? $registrasi->provinsi_id,
-                'kabupaten_id'         => $data['kabupaten_id'] ?? $registrasi->kabupaten_id,
-                'kecamatan_id'         => $data['kecamatan_id'] ?? $registrasi->kecamatan_id,
-                'kelurahan_id'         => $data['kelurahan_id'] ?? $registrasi->kelurahan_id,
-                'patokan'              => $data['patokan'] ?? $registrasi->patokan,
-                'nik'                  => $data['nik'] ?? $registrasi->nik,
-                'foto_ktp'             => $foto_ktp,
-                'foto_rmh'             => $foto_rmh,
-                'foto_kk'              => $foto_kk,
-                'status_lokasi_id'     => $data['status_lokasi_id'] ?? $registrasi->status_lokasi_id,
-                'produk_id'            => $data['produk_id'] ?? $registrasi->produk_id,
-                'tahu_layanan_id'      => $data['tahu_layanan_id'] ?? $registrasi->tahu_layanan_id,
-                'alasan_id'            => $data['alasan_id'] ?? $registrasi->alasan_id,
-                'layanan_digunakan_id' => $data['layanan_digunakan_id'] ?? $registrasi->layanan_digunakan_id,
-                'unit_id'              => $data['unit_id'] ?? $registrasi->unit_id,
-                'tanggal'              => $tanggal,
-                'pegawai_id'           => $data['pegawai_id'] ?? $registrasi->pegawai_id,
-                'stts_create'          => $data['stts_create'] ?? $registrasi->stts_create,
-                'stts_ver'             => $data['stts_ver'] ?? $registrasi->stts_ver,
-                'longlat'              => $data['longlat'] ?? $registrasi->longlat,
-                'userid_app'           => $data['userid_app'] ?? $registrasi->userid_app,
-                'order_id'             => $data['order_id'] ?? $registrasi->order_id,
-            ]);
-
-            echo json_encode(['success' => true, 'data' => $registrasi]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Gagal update data', 'error' => $e->getMessage()]);
+        if (!$registrasi) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
+            return;
         }
+
+        // Update hanya 5 kolom ini
+        $registrasi->update([
+            'nama_lengkap' => $data['nama_lengkap'] ?? $registrasi->nama_lengkap,
+            'whatsapp'     => $data['whatsapp'] ?? $registrasi->whatsapp,
+            'alamat'       => $data['alamat'] ?? $registrasi->alamat,
+            'stts_create'  => $data['stts_create'] ?? $registrasi->stts_create,
+            'unit_id'      => $data['unit_id'] ?? $registrasi->unit_id,
+        ]);
+
+        echo json_encode(['success' => true, 'data' => $registrasi]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Gagal update data',
+            'error'   => $e->getMessage()
+        ]);
     }
+}
+
 
     public function destroy($id)
     {
