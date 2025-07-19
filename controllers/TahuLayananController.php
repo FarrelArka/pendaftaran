@@ -26,24 +26,51 @@ class TahuLayananController
     }
 
     public function store()
-    {
-        header('Content-Type: application/json');
-        $input = json_decode(file_get_contents("php://input"), true);
+{
+    header('Content-Type: application/json');
+    $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($input['nama'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Nama diperlukan']);
-            return;
-        }
+    if (!$input) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Input tidak valid']);
+        return;
+    }
 
-        try {
+    // Cek apakah input berupa array banyak atau hanya satu objek
+    $isMulti = array_keys($input) === range(0, count($input) - 1);
+
+    try {
+        if ($isMulti) {
+            // Validasi tiap item harus punya nama
+            foreach ($input as $item) {
+                if (!isset($item['nama'])) {
+                    throw new Exception("Semua item harus memiliki 'nama'");
+                }
+            }
+
+            $data = [];
+            foreach ($input as $item) {
+                $data[] = TahuLayanan::create(['nama' => $item['nama']]);
+            }
+
+            echo json_encode(['success' => true, 'data' => $data]);
+        } else {
+            // Input tunggal
+            if (!isset($input['nama'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Nama diperlukan']);
+                return;
+            }
+
             $data = TahuLayanan::create(['nama' => $input['nama']]);
             echo json_encode(['success' => true, 'data' => $data]);
-        } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
+}
+    
 
     public function update($id)
     {

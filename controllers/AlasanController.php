@@ -26,24 +26,50 @@ class AlasanController
     }
 
     public function store()
-    {
-        header('Content-Type: application/json');
-        $input = json_decode(file_get_contents("php://input"), true);
+{
+    header('Content-Type: application/json');
+    $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($input['nama'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Nama diperlukan']);
-            return;
+    if (!$input) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Input tidak valid']);
+        return;
+    }
+
+    // Ubah input menjadi array jika hanya kirim satu object
+    $items = isset($input[0]) ? $input : [$input];
+
+    $created = [];
+    $errors = [];
+
+    foreach ($items as $i => $item) {
+        if (!isset($item['nama']) || empty($item['nama'])) {
+            $errors[] = "Item ke-$i: Nama diperlukan";
+            continue;
         }
 
         try {
-            $data = Alasan::create(['nama' => $input['nama']]);
-            echo json_encode(['success' => true, 'data' => $data]);
+            $data = Alasan::create(['nama' => $item['nama']]);
+            $created[] = $data;
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            $errors[] = "Item ke-$i: " . $e->getMessage();
         }
     }
+
+    if (!empty($errors)) {
+        http_response_code(207); // 207 Multi-Status (partial success)
+        echo json_encode([
+            'success' => false,
+            'message' => 'Sebagian data gagal disimpan',
+            'errors' => $errors,
+            'data' => $created
+        ]);
+        return;
+    }
+
+    echo json_encode(['success' => true, 'data' => $created]);
+}
+
 
     public function update($id)
     {

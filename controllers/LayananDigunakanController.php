@@ -26,27 +26,51 @@ class LayananDigunakanController
         echo json_encode(['success' => true, 'data' => $data]);
     }
 
-    public function store()
-    {
-        header('Content-Type: application/json');
-        $data = json_decode(file_get_contents("php://input"), true);
+public function store()
+{
+    header('Content-Type: application/json');
+    $data = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($data['nama'])) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Field "nama" wajib diisi']);
-            return;
+    if (!$data) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Input tidak valid']);
+        return;
+    }
+
+    // Cek apakah data array atau single object
+    $items = isset($data[0]) ? $data : [$data];
+
+    $created = [];
+    $errors = [];
+
+    foreach ($items as $i => $item) {
+        if (!isset($item['nama']) || empty($item['nama'])) {
+            $errors[] = "Item ke-$i: Field 'nama' wajib diisi";
+            continue;
         }
 
         try {
-            $new = LayananDigunakan::create([
-                'nama' => $data['nama']
-            ]);
-            echo json_encode(['success' => true, 'data' => $new]);
+            $new = LayananDigunakan::create(['nama' => $item['nama']]);
+            $created[] = $new;
         } catch (Exception $e) {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'message' => 'Gagal menyimpan', 'error' => $e->getMessage()]);
+            $errors[] = "Item ke-$i: " . $e->getMessage();
         }
     }
+
+    if (!empty($errors)) {
+        http_response_code(207); // Multi-Status
+        echo json_encode([
+            'success' => false,
+            'message' => 'Sebagian data gagal disimpan',
+            'data' => $created,
+            'errors' => $errors
+        ]);
+        return;
+    }
+
+    echo json_encode(['success' => true, 'data' => $created]);
+}
+
 
     public function update($id)
     {

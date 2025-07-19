@@ -26,23 +26,30 @@ class StatusLokasiController
     }
 
     public function store()
-    {
-        header('Content-Type: application/json');
-        $data = json_decode(file_get_contents("php://input"), true);
+{
+    header('Content-Type: application/json');
+    $input = json_decode(file_get_contents("php://input"), true);
 
-        if (!isset($data['nama'])) {
-            echo json_encode(['success' => false, 'message' => 'Nama diperlukan']);
-            return;
-        }
+    // Jika input berupa 1 object saja, bungkus ke array
+    $items = isset($input[0]) ? $input : [$input];
+
+    $created = [];
+
+    foreach ($items as $data) {
+        if (!isset($data['nama'])) continue;
 
         try {
-            $created = StatusLokasi::create(['nama' => $data['nama']]);
-            echo json_encode(['success' => true, 'data' => $created]);
+            $createdItem = StatusLokasi::create(['nama' => $data['nama']]);
+            $created[] = $createdItem;
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            return;
         }
     }
+
+    echo json_encode(['success' => true, 'data' => $created]);
+}
 
     public function update($id)
     {
