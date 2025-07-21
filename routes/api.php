@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 use Bramus\Router\Router;
+use Controllers\UserController;
 use Controllers\RegistrasiController;
 use Controllers\LayananDigunakanController;
 use Controllers\StatusLokasiController;
@@ -29,6 +30,7 @@ use Controllers\SobatController;
 
 
 $router = new Router();
+$userController = new UserController();
 $controller = new RegistrasiController();
 $layananController = new LayananDigunakanController();
 $statusLokasi = new StatusLokasiController();
@@ -36,6 +38,17 @@ $tahu = new TahuLayananController();
 $alasan = new AlasanController();
 $sobatController = new SobatController();
 
+$router->post('/api/register', function() use ($userController) {
+    $userController->register();
+});
+
+$router->post('/api/login', function() use ($userController) {
+    $userController->login();
+});
+
+$router->get('/api/logout', function() use ($userController) {
+    $userController->logout();
+});
 
 // 🔸 Create
 $router->post('/registrasi', function () use ($controller) {
