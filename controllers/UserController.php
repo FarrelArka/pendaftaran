@@ -10,7 +10,8 @@ class UserController
     public function register()
     {
         header('Content-Type: application/json');
-        $data = $_POST;
+        $data = json_decode(file_get_contents('php://input'), true);
+
 
         try {
             // Validasi sederhana
