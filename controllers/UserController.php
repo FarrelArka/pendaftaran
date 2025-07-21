@@ -38,28 +38,31 @@ class UserController
     }
 
     public function login()
-    {
-        header('Content-Type: application/json');
-        $data = $_POST;
+{
+    header('Content-Type: application/json');
+    session_start(); // 🔥 Mulai sesi
 
-        try {
-            if (empty($data['username']) || empty($data['password'])) {
-                throw new Exception('Username dan Password wajib diisi');
-            }
+    $data = json_decode(file_get_contents('php://input'), true);
 
-            $user = User::where('username', $data['username'])->first();
-            if (!$user || !password_verify($data['password'], $user->password)) {
-                throw new Exception('Username atau password salah');
-            }
-
-            // Simulasi session login
-            $_SESSION['user_id'] = $user->id;
-
-            echo json_encode(['success' => true, 'message' => 'Login berhasil', 'user' => $user]);
-        } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
+    if (!isset($data['username'], $data['password'])) {
+        http_response_code(400);
+        echo json_encode(['message' => 'Username dan password wajib diisi']);
+        return;
     }
+
+    $user = User::where('username', $data['username'])->first();
+
+    if ($user && password_verify($data['password'], $user->password)) {
+        $_SESSION['user_id'] = $user->id;
+        $_SESSION['username'] = $user->username;
+
+        echo json_encode(['message' => 'Login berhasil', 'user' => $user]);
+    } else {
+        http_response_code(401);
+        echo json_encode(['message' => 'Login gagal']);
+    }
+}
+
 
     public function logout()
     {
