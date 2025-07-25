@@ -103,24 +103,33 @@ class RegistrasiController
     public function update($id)
 {
     header('Content-Type: application/json');
-    try {
-        $data = $_POST;
-        $registrasi = RegistrasiModel::find($id);
 
+    try {
+        // Deteksi jenis konten (JSON atau form-data)
+        $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+        if (strpos($contentType, 'application/json') !== false) {
+            $data = json_decode(file_get_contents("php://input"), true);
+        } else {
+            $data = $_POST;
+        }
+
+        $registrasi = RegistrasiModel::find($id);
         if (!$registrasi) {
             http_response_code(404);
             echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
             return;
         }
 
-        // Update hanya 5 kolom ini
-        $registrasi->update([
-            'nama_lengkap' => $data['nama_lengkap'] ?? $registrasi->nama_lengkap,
-            'whatsapp'     => $data['whatsapp'] ?? $registrasi->whatsapp,
-            'alamat'       => $data['alamat'] ?? $registrasi->alamat,
-            'stts_create'  => $data['stts_create'] ?? $registrasi->stts_create,
-            'unit_id'      => $data['unit_id'] ?? $registrasi->unit_id,
-        ]);
+        $fillable = $registrasi->getFillable();
+        $updateData = [];
+
+        foreach ($data as $key => $value) {
+            if (in_array($key, $fillable)) {
+                $updateData[$key] = $value;
+            }
+        }
+
+        $registrasi->update($updateData);
 
         echo json_encode(['success' => true, 'data' => $registrasi]);
     } catch (Exception $e) {
@@ -132,7 +141,6 @@ class RegistrasiController
         ]);
     }
 }
-
 
     public function destroy($id)
     {

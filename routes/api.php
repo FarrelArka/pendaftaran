@@ -66,7 +66,7 @@ $router->get('/registrasi/(\d+)', function ($id) use ($controller) {
 });
 
 // 🔸 Update
-$router->post('/registrasi/(\d+)/update', function ($id) use ($controller) {
+$router->post('/registrasi/update/(\d+)', function ($id) use ($controller) {
   $controller->update($id);
 });
 
