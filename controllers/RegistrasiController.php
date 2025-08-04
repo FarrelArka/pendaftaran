@@ -164,7 +164,7 @@ class RegistrasiController
         $data = RegistrasiModel::find($id);
         if (!$data) {
             http_response_code(404);
-            echo json_encode(['success' => false, 'message' => 'Data tidak ditemukan']);
+            echo json_encode(['success' => false, 'message' => 'Data    tidak ditemukan']);
             return;
         }
         $data->delete();

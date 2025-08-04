@@ -1,6 +1,26 @@
 <?php
+// 🔧 Middleware CORS Global
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowed_origins = [
+    'http://127.0.0.1:5500',
+    'http://localhost:5500'
+];
+
+if (in_array($origin, $allowed_origins)) {
+    header("Access-Control-Allow-Origin: $origin");
+}
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+
 
 use Bramus\Router\Router;
+use Controllers\UserController;
 use Controllers\RegistrasiController;
 use Controllers\LayananDigunakanController;
 use Controllers\StatusLokasiController;
@@ -21,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 
 $router = new Router();
+$userController = new UserController();
 $controller = new RegistrasiController();
 $layananController = new LayananDigunakanController();
 $statusLokasi = new StatusLokasiController();
@@ -28,6 +49,17 @@ $tahu = new TahuLayananController();
 $alasan = new AlasanController();
 $sobatController = new SobatController();
 
+$router->post('/api/register', function() use ($userController) {
+    $userController->register();
+});
+
+$router->post('/api/login', function() use ($userController) {
+    $userController->login();
+});
+
+$router->get('/api/logout', function() use ($userController) {
+    $userController->logout();
+});
 
 // 🔸 Create
 $router->post('/registrasi', function () use ($controller) {
