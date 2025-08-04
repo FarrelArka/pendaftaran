@@ -3,6 +3,7 @@
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Dotenv\Dotenv;
 
+require_once __DIR__ . '/../vendor/autoload.php';
 // Load .env
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
@@ -23,3 +24,11 @@ $capsule->addConnection([
 
 $capsule->setAsGlobal();
 $capsule->bootEloquent();
+
+try {
+    $pdo = $capsule->getConnection()->getPdo();
+    // echo "✅ Database connected successfully.<br>"; // Jangan echo di production
+    $conn = $pdo; // Inisialisasi variabel global $conn
+} catch (Exception $e) {
+    die("❌ Database connection failed: " . $e->getMessage());
+}

@@ -8,6 +8,17 @@ use Controllers\TahuLayananController;
 use Controllers\AlasanController;
 use Controllers\SobatController;
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Content-Type: application/json");
+
+// Handle preflight OPTIONS requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 
 $router = new Router();
 $controller = new RegistrasiController();
@@ -34,7 +45,7 @@ $router->get('/registrasi/(\d+)', function ($id) use ($controller) {
 });
 
 // 🔸 Update
-$router->post('/registrasi/(\d+)/update', function ($id) use ($controller) {
+$router->put('/registrasi/update/(\d+)', function ($id) use ($controller) {
   $controller->update($id);
 });
 
@@ -56,7 +67,7 @@ $router->post('/layanan-digunakan', function () use ($layananController) {
     $layananController->store();
 });
 
-$router->put('/layanan-digunakan/(\d+)', function ($id) use ($layananController) {
+$router->put('/layanan-digunakan/update/(\d+)', function ($id) use ($layananController) {
     $layananController->update($id);
 });
 
@@ -75,7 +86,7 @@ $router->post('/status-lokasi', function () use ($statusLokasi) {
   $statusLokasi->store();
 });
 
-$router->put('/status-lokasi/(\d+)', function ($id) use ($statusLokasi) {
+$router->put('/status-lokasi/update/(\d+)', function ($id) use ($statusLokasi) {
   $statusLokasi->update($id);
 });
 
@@ -94,7 +105,7 @@ $router->post('/tahu-layanan', function () use ($tahu) {
   $tahu->store();
 });
 
-$router->put('/tahu-layanan/(\d+)', function ($id) use ($tahu) {
+$router->put('/tahu-layanan/update/(\d+)', function ($id) use ($tahu) {
   $tahu->update($id);
 });
 
@@ -110,7 +121,7 @@ $router->get('/alasan/(\d+)', function ($id) use ($alasan) {
 $router->post('/alasan', function () use ($alasan) {
   $alasan->store();
 });
-$router->put('/alasan/(\d+)', function ($id) use ($alasan) {
+$router->put('/alasan/update/(\d+)', function ($id) use ($alasan) {
   $alasan->update($id);
 });
 $router->delete('/alasan/(\d+)', function ($id) use ($alasan) {
@@ -129,13 +140,20 @@ $router->post('/sobat', function () use ($sobatController) {
   $sobatController->store();
 });
 
-$router->post('/sobat/(\d+)/update', function ($id) use ($sobatController) {
+$router->put('/sobat/update/(\d+)', function ($id) use ($sobatController) {
   $sobatController->update($id);
 });
 
 $router->delete('/sobat/(\d+)', function ($id) use ($sobatController) {
   $sobatController->destroy($id);
 });
+
+// Tambahkan route root agar tidak 404
+$router->get('/', function () {
+  $content = __DIR__ . '/../../../frontend/home.php';
+  include __DIR__ . '/../../../frontend/layouts/template.php';
+});
+
 
 // ✅ Run all routes
 $router->run();

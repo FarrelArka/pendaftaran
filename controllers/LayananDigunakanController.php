@@ -5,13 +5,15 @@ namespace Controllers;
 use Models\LayananDigunakan;
 use Exception;
 
+require_once __DIR__ . '/../database/connection.php';
+
 class LayananDigunakanController
 {
     public function index()
     {
         header('Content-Type: application/json');
         $data = LayananDigunakan::all();
-        echo json_encode(['success' => true, 'data' => $data]);
+        echo json_encode($data);
     }
 
     public function show($id)

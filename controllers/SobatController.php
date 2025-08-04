@@ -2,10 +2,10 @@
 
 namespace Controllers;
 
-require_once __DIR__ . '/../database/connection.php';
-
 use Exception;
 use PDO;
+
+require_once __DIR__ . '/../database/connection.php';
 
 class SobatController
 {

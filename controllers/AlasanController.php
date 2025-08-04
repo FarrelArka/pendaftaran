@@ -5,12 +5,14 @@ namespace Controllers;
 use Models\Alasan;
 use Exception;
 
+require_once __DIR__ . '/../database/connection.php';
+
 class AlasanController
 {
     public function index()
     {
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => Alasan::all()]);
+        echo json_encode(Alasan::all());
     }
 
     public function show($id)

@@ -5,6 +5,8 @@ namespace Controllers;
 use Models\StatusLokasi;
 use Exception;
 
+require_once __DIR__ . '/../database/connection.php';
+
 class StatusLokasiController
 {
     public function index()

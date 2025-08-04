@@ -57,4 +57,25 @@ class Registrasi extends Model
     protected $casts = [
         'whatsapp' => 'array',
     ];
+
+    // Relasi ke tabel lain
+    public function alasan()
+    {
+        return $this->belongsTo(Alasan::class, 'alasan_id');
+    }
+
+    public function layananDigunakan()
+    {
+        return $this->belongsTo(LayananDigunakan::class, 'layanan_digunakan_id');
+    }
+
+    public function statusLokasi()
+    {
+        return $this->belongsTo(StatusLokasi::class, 'status_lokasi_id');
+    }
+
+    public function tahuLayanan()
+    {
+        return $this->belongsTo(TahuLayanan::class, 'tahu_layanan_id');
+    }
 }

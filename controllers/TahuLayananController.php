@@ -5,12 +5,14 @@ namespace Controllers;
 use Models\TahuLayanan;
 use Exception;
 
+require_once __DIR__ . '/../database/connection.php';
+
 class TahuLayananController
 {
     public function index()
     {
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'data' => TahuLayanan::all()]);
+        echo json_encode(TahuLayanan::all());
     }
 
     public function show($id)

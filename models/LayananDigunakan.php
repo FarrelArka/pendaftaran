@@ -9,4 +9,9 @@ class LayananDigunakan extends Model
     protected $table = 'layanan_digunakan';
     protected $fillable = ['nama'];
     public $timestamps = false; // nonaktifkan kalau tidak ada created_at/updated_at
+
+    public function registrasi()
+    {
+        return $this->hasMany(Registrasi::class, 'layanan_digunakan_id');
+    }
 }
