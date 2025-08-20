@@ -7,6 +7,7 @@ use Controllers\StatusLokasiController;
 use Controllers\TahuLayananController;
 use Controllers\AlasanController;
 use Controllers\SobatController;
+use Controllers\PaymentActivityController;
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
@@ -28,6 +29,7 @@ $statusLokasi = new StatusLokasiController();
 $tahu = new TahuLayananController();
 $alasan = new AlasanController();
 $sobatController = new SobatController();
+$paymentController = new PaymentActivityController();
 
 $router->post('/api/register', function() use ($userController) {
     $userController->register();
@@ -158,6 +160,11 @@ $router->put('/sobat/update/(\d+)', function ($id) use ($sobatController) {
 
 $router->delete('/sobat/(\d+)', function ($id) use ($sobatController) {
   $sobatController->destroy($id);
+});
+
+// 🔸 Payment Activity / Extend Report
+$router->get('/payment-activity', function () use ($paymentController) {
+  $paymentController->getExtendReport();
 });
 
 // Tambahkan route root agar tidak 404
